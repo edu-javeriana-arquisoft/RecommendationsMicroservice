@@ -12,7 +12,7 @@ public class RecommendationsContext : DbContext
 
 	public RecommendationsContext(IConfiguration configuration)
 	{
-		_dbConnectionString = configuration["ConnectionStrings:DefaultConnection"]!;
+		_dbConnectionString = configuration["ConnectionStrings:DatabaseConnection"]!;
 	}
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>

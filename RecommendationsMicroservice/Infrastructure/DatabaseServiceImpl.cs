@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using RecommendationsMicroservice.Persistance;
 
-namespace RecommendationsMicroservice.Services;
+namespace RecommendationsMicroservice.Services.Infrastructure;
 
-public class RecommendationsDatabaseService : IDatabaseService
+public class DatabaseServiceImpl : IDatabaseService
 {
 	private readonly RecommendationsContext _dbContext;
 
-	public RecommendationsDatabaseService(RecommendationsContext dbContext)
+	public DatabaseServiceImpl(RecommendationsContext dbContext)
 	{
 		_dbContext = dbContext;
 	}

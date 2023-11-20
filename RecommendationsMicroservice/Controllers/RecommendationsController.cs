@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using RecommendationsMicroservice.Persistance;
+using RecommendationsMicroservice.Entities;
 using RecommendationsMicroservice.Services;
 
 namespace RecommendationsMicroservice.Controllers;
@@ -12,5 +12,24 @@ public class RecommendationsController : ControllerBase
 	public RecommendationsController(IDatabaseService dbService)
 	{
 		_dbService = dbService;
+	}
+
+
+	[HttpGet("[action]/{userGuid}")]
+	public ActionResult<List<CategoryStatistics>> GetTopCategoriesForUser(string userGuid, [FromQuery] int? count)
+	{
+		try
+		{
+			var userParsedGuid = Guid.Parse(userGuid);
+			return _dbService.TopCategoriesForUser(userParsedGuid, count ?? 5);
+		}
+		catch (FormatException)
+		{
+			return BadRequest();
+		}
+		catch
+		{
+			return NotFound();
+		}
 	}
 }
