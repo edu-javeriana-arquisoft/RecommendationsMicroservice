@@ -1,10 +1,10 @@
 version: "3"
 
 services:
-  kafka:
+  kafka-broker:
     image: docker.io/bitnami/kafka:3.6
     ports:
-      - "9094:9094"
+      - 9094:9094
 
     volumes:
       - "kafka_data:/bitnami"
@@ -18,6 +18,53 @@ services:
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
 
+  recommendations-database:
+    image: mysql:latest
+    restart: always
+
+    environment:
+      MYSQL_DATABASE: 'recommendations'
+      MYSQL_USER: 'arquisoft'
+      MYSQL_PASSWORD: 'arquisoft'
+      MYSQL_ROOT_PASSWORD: 'arquisoft'
+
+    expose:
+      - '3306'
+
+    volumes:
+      - recommendations-database:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 60s
+      retries: 10
+
+  recommendations-microservice:
+    build:
+      context: .
+      dockerfile: ./RecommendationsMicroservice/Dockerfile
+      args:
+        - PORT=8052
+    
+    ports:
+      - 8052:8052
+    
+    environment:
+      Urls: http://products-microservice:8052
+      ConnectionStrings__DatabaseConnection: "Server=recommendations-database;Database=recommendations;User=arquisoft;Password=arquisoft;"
+      KafkaBroker__Server: "kafka-broker:9094"
+      eureka__client__serviceUrl: http://localhost:8761/eureka/
+      eureka__instance__port: 8052
+
+    depends_on:
+      kafka-broker:
+        condition: service_started
+
+      recommendations-database:
+        condition: service_healthy
+
 volumes:
+  recommendations-database:
   kafka_data:
     driver: local
