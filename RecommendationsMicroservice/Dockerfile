@@ -16,5 +16,6 @@ EXPOSE $PORT
 
 WORKDIR /Application/RecommendationsMicroservice
 
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["/bin/bash"]
+CMD ["entrypoint.sh"]
 

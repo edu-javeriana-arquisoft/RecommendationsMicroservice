@@ -25,6 +25,8 @@ public class InteractionConsumerService : BackgroundService, IDisposable
 		_topic = configuration["KafkaBroker:Topic"]!;
 		_scopeFactory = scopeFactory;
 		_logger = logger;
+
+		_logger.LogInformation($"Connecting to kafka broker `{configuration["KafkaBroker:Server"]!}` with topic `{_topic}`");
 	}
 
 	protected override async Task ExecuteAsync(CancellationToken stoppingToken)

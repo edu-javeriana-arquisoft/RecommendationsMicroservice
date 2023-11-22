@@ -9,12 +9,15 @@ services:
     volumes:
       - "kafka_data:/bitnami"
 
+    networks:
+      - arqui
+
     environment:
       - KAFKA_CFG_NODE_ID=0
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@<your_host>:9093
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-broker:9092,EXTERNAL://kafka-broker:9094
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
 
@@ -28,8 +31,8 @@ services:
       MYSQL_PASSWORD: 'arquisoft'
       MYSQL_ROOT_PASSWORD: 'arquisoft'
 
-    expose:
-      - '3306'
+    networks:
+      - arqui
 
     volumes:
       - recommendations-database:/var/lib/mysql
@@ -54,8 +57,11 @@ services:
       Urls: http://products-microservice:8052
       ConnectionStrings__DatabaseConnection: "Server=recommendations-database;Database=recommendations;User=arquisoft;Password=arquisoft;"
       KafkaBroker__Server: "kafka-broker:9094"
-      eureka__client__serviceUrl: http://localhost:8761/eureka/
+      eureka__client__serviceUrl: http://eureka:8761/eureka/
       eureka__instance__port: 8052
+
+    networks:
+      - arqui
 
     depends_on:
       kafka-broker:
@@ -68,3 +74,7 @@ volumes:
   recommendations-database:
   kafka_data:
     driver: local
+
+networks:
+  arqui:
+    name: arquisoft_network
