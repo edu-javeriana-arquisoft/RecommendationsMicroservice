@@ -20,6 +20,26 @@ services:
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-broker:9092,EXTERNAL://kafka-broker:9094
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+  
+  kafka-ws:
+    build:
+      context: ./KafkaWebSocket
+      dockerfile: ./Dockerfile
+
+    environment:
+      KAFKA_SERVER: kafka-broker:9094
+      KAFKA_TOPIC: interactions
+      USE_PORT: 9093
+
+    ports:
+      - 9093:9093
+
+    networks:
+      - arqui
+
+    depends_on:
+      kafka-broker:
+        condition: service_started
 
   recommendations-database:
     image: mysql:latest
